@@ -129,7 +129,7 @@ import listenVisualViewport from "@/compositions/visual-viewport";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
 const inWeiXin = navigator.userAgent.toLowerCase().includes("micromessenger");
-const searchParams = new URLSearchParams(location.search);
+const pathnames = location.pathname.split("/").filter((p) => p);
 const loading = reactive({
   nick: false,
 });
@@ -144,14 +144,14 @@ const dialogs = ref([]);
 const connected = ref(false);
 let wsOrigin = WS_ORIGIN;
 let hash = HASH;
-let room = searchParams.get("room");
+let room = pathnames[0];
 let socket;
 let justClosedUser;
 
 if (!room) {
-  room = randomString(16);
+  room = "public";
   searchParams.set("room", room);
-  location.search = searchParams.toString();
+  location.pathname = room;
 }
 
 if (location.host === "127.0.0.1:3001") {
