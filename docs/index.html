@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-grey-lighten-3">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <title>阅后即焚</title>
+    <script type="module" crossorigin src="/assets/index-0c9b8cec.js"></script>
+    <link rel="stylesheet" href="/assets/index-6a307f74.css">
+  </head>
+
+  <body>
+    <div id="app" class="d-flex flex-column"></div>
+    
+  </body>
+  <script>
+    // ios 禁止缩放/双击
+    window.onload = function () {
+      var lastTouchEnd = 0;
+      document.addEventListener('touchstart', function (event) {
+        if (event.touches.length > 1) {
+          event.preventDefault();
+        }
+      });
+      document.addEventListener(
+        'touchend',
+        function (event) {
+          var now = +new Date();
+          if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+          }
+          lastTouchEnd = now;
+        },
+        false,
+      );
+      document.addEventListener('gesturestart', function (event) {
+        event.preventDefault();
+      });
+      document.addEventListener('dblclick', function (event) {
+        event.preventDefault();
+      });
+    };
+  </script>
+</html>
