@@ -9,6 +9,7 @@
       <span>1</span>
       <span style="position: absolute; right: 12px">设置</span>
     </div> -->
+    <v-divider></v-divider>
     <div
       class="d-flex flex-column flex-1-1 pa-3 overflow-auto dialogs-container"
       ref="dialogsContainer"
@@ -60,6 +61,7 @@
         </template>
       </TransitionGroup>
     </div>
+    <v-divider></v-divider>
     <div class="d-flex px-4 py-2 pb-5 input-container bg-grey-lighten-4">
       <v-textarea
         @focus="scrollToBottom()"
@@ -85,6 +87,14 @@
     v-if="!connected"
   >
     <div class="w-75">
+      <div class="mt-2" v-if="inWeiXin">
+        <v-alert
+          position="absolute"
+          location="top right"
+          variant="text"
+          text="进入“浮窗”模式体验更佳 ⬆"
+        ></v-alert>
+      </div>
       <v-text-field
         class="mt-16"
         :loading="loading.nick"
@@ -118,6 +128,7 @@ import {
 import listenVisualViewport from "@/compositions/visual-viewport";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
+const inWeiXin = navigator.userAgent.toLowerCase().includes("micromessenger");
 const searchParams = new URLSearchParams(location.search);
 const loading = reactive({
   nick: false,
@@ -339,10 +350,6 @@ body,
 }
 </style>
 <style lang="scss" scoped>
-.dialogs-container {
-  border-top: 0.5px solid #e1e1e1;
-  border-bottom: 0.5px solid #e1e1e1;
-}
 .dialog-badge {
   background-color: #fff;
   &.own {
