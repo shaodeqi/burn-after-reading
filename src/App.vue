@@ -92,7 +92,7 @@
           position="absolute"
           location="top right"
           variant="text"
-          text="进入“浮窗”模式体验更佳 ⬆"
+          text="进入“浮窗”模式体验更佳 ➚"
         ></v-alert>
       </div>
       <v-text-field
