@@ -79,6 +79,7 @@
         :loading="loading.nick"
         label="请输入昵称"
         v-model="nick"
+        enterkeyhint="done"
         @keydown.enter="handleNick"
       ></v-text-field>
     </div>
