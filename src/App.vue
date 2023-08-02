@@ -150,7 +150,6 @@ let justClosedUser;
 
 if (!room) {
   room = "public";
-  searchParams.set("room", room);
   location.pathname = room;
 }
 
