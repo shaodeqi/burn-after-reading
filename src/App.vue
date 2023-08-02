@@ -14,39 +14,50 @@
       ref="dialogsContainer"
     >
       <TransitionGroup name="dialog">
-        <div
-          v-for="(dialog, dIndex) in dialogs"
-          :key="dialog.id"
-          :class="[own(dialog) ? 'align-self-end' : 'align-self-start']"
-          style="max-width: 90%"
-          @click="handleRead(dialog, dIndex)"
-        >
+        <template v-for="(dialog, dIndex) in dialogs" :key="dialog.id">
           <div
-            class="text-medium-emphasis text-body-2"
-            :class="[own(dialog) ? 'text-right' : 'text-left']"
-          >
-            {{ dialog.nick }}
-          </div>
-          <v-badge
-            color="red-lighten-1"
-            :model-value="badge(dialog)"
-            :content="dialog.countDown"
-            :dot="dot(dialog)"
-            :location="own(dialog) ? 'top start' : 'top end'"
-            :class="{ own: own(dialog) }"
-            class="mb-4 px-1 rounded dialog-badge"
+            v-if="dialog.type === 'text'"
+            :class="[own(dialog) ? 'align-self-end' : 'align-self-start']"
+            style="max-width: 90%"
+            @click="handleRead(dialog, dIndex)"
           >
             <div
-              style="white-space: break-spaces"
-              class="px-1 py-2 dialog"
-              :class="{
-                blur: blur(dialog),
-              }"
+              class="text-medium-emphasis text-body-2"
+              :class="[own(dialog) ? 'text-right' : 'text-left']"
             >
-              {{ dialog.message }}
+              {{ dialog.nick }}
             </div>
-          </v-badge>
-        </div>
+            <v-badge
+              color="red-lighten-1"
+              :model-value="badge(dialog)"
+              :content="dialog.countDown"
+              :dot="dot(dialog)"
+              :location="own(dialog) ? 'top start' : 'top end'"
+              :class="{ own: own(dialog) }"
+              class="mb-4 px-1 rounded dialog-badge"
+            >
+              <div
+                style="white-space: break-spaces"
+                class="px-1 py-2 dialog"
+                :class="{
+                  blur: blur(dialog),
+                }"
+              >
+                {{ dialog.message }}
+              </div>
+            </v-badge>
+          </div>
+          <div v-if="dialog.type === 'state.enter'" class="align-self-center">
+            <span class="text-body-2 text-grey-darken-1"
+              >{{ dialog.message }}进入房间</span
+            >
+          </div>
+          <div v-if="dialog.type === 'state.leave'" class="align-self-center">
+            <span class="text-body-2 text-grey-darken-1"
+              >{{ dialog.message }}离开房间</span
+            >
+          </div>
+        </template>
       </TransitionGroup>
     </div>
     <div class="d-flex px-4 py-2 pb-5 input-container bg-grey-lighten-4">
@@ -102,6 +113,7 @@ import {
   handleMessageData,
   HASH,
   WS_ORIGIN,
+  CLOSE_COOLING_MS,
 } from "@/utils";
 import listenVisualViewport from "@/compositions/visual-viewport";
 import ReconnectingWebSocket from "reconnecting-websocket";
@@ -123,6 +135,7 @@ let wsOrigin = WS_ORIGIN;
 let hash = HASH;
 let room = searchParams.get("room");
 let socket;
+let justClosedUser;
 
 if (!room) {
   room = randomString(16);
@@ -211,8 +224,32 @@ const connect = () => {
   };
   socket.onmessage = async ({ data: originData }) => {
     const payload = await handleMessageData(originData);
-    let { cmd, data } = payload;
+    let { cmd, data, user } = payload;
     switch (cmd) {
+      case "connect":
+        if (justClosedUser === user) {
+          dialogs.value.pop();
+        }
+
+        if (dialogs.value[dialogs.value.length - 1]?.type === "state.enter") {
+          return;
+        }
+
+        dialogs.value.push({
+          type: "state.enter",
+          message: user,
+        });
+        break;
+      case "close":
+        justClosedUser = user;
+        setTimeout(() => {
+          justClosedUser = "";
+        }, CLOSE_COOLING_MS);
+        dialogs.value.push({
+          type: "state.leave",
+          message: user,
+        });
+        break;
       case "send":
         switch (data?.type) {
           case "message.get":
