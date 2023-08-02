@@ -152,6 +152,7 @@ if (!room) {
   room = "public";
   location.pathname = room;
 }
+document.title = room;
 
 if (location.host === "127.0.0.1:3001") {
   hash = "b793bde3f67ae928d93dc96fa16f2b93";
