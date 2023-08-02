@@ -72,7 +72,7 @@
         bg-color="white"
         theme="white"
         maxlength="300"
-        enterkeyhint="send"
+        enterkeyhint="go"
         v-model="message"
         auto-grow
         variant="outlined"
@@ -92,15 +92,15 @@
           position="fixed"
           location="top right"
           variant="text"
-          text="进入“浮窗”模式体验更佳 ⇧"
+          text="进入“浮窗”模式体验更佳 ⇧ "
         ></v-alert>
       </div>
       <v-text-field
         class="mt-16"
         :loading="loading.nick"
-        label="请输入昵称"
+        label="请输入昵称后 ⏎ 进入"
         v-model="nick"
-        enterkeyhint="done"
+        enterkeyhint="enter"
         @keydown.enter="handleNick"
       ></v-text-field>
     </div>
