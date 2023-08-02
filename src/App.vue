@@ -69,12 +69,13 @@
     </div>
   </div>
   <div
-    class="d-flex flex-column justify-center align-center fill-height w-100"
+    class="d-flex flex-column align-center fill-height w-100"
     style="position: absolute"
     v-if="!connected"
   >
     <div class="w-75">
       <v-text-field
+        class="mt-16"
         :loading="loading.nick"
         label="请输入昵称"
         v-model="nick"
