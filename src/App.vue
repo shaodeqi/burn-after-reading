@@ -98,7 +98,7 @@
       <v-text-field
         class="mt-16"
         :loading="loading.nick"
-        label="请输入昵称后 ⏎ 进入"
+        label="请输入昵称后 ↵ 进入"
         v-model="nick"
         enterkeyhint="go"
         @keydown.enter="handleNick"
