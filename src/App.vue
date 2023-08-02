@@ -89,10 +89,10 @@
     <div class="w-75">
       <div class="mt-2" v-if="inWeiXin">
         <v-alert
-          position="absolute"
+          position="fixed"
           location="top right"
           variant="text"
-          text="进入“浮窗”模式体验更佳 ➚"
+          text="进入“浮窗”模式体验更佳 ⇧"
         ></v-alert>
       </div>
       <v-text-field
@@ -128,7 +128,7 @@ import {
 import listenVisualViewport from "@/compositions/visual-viewport";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
-const inWeiXin = navigator.userAgent.toLowerCase().includes("micromessenger");
+const inWeiXin = !navigator.userAgent.toLowerCase().includes("micromessenger");
 const searchParams = new URLSearchParams(location.search);
 const loading = reactive({
   nick: false,
