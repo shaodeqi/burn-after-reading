@@ -100,7 +100,7 @@
         :loading="loading.nick"
         label="请输入昵称后 ⏎ 进入"
         v-model="nick"
-        enterkeyhint="enter"
+        enterkeyhint="go"
         @keydown.enter="handleNick"
       ></v-text-field>
     </div>
