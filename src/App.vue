@@ -253,7 +253,7 @@ const connect = () => {
       case "send":
         switch (data?.type) {
           case "message.get":
-            if (data.content instanceof Array) {
+            if (data.content instanceof Array && data.length) {
               dialogs.value = data.content;
             }
             scrollToBottom();
