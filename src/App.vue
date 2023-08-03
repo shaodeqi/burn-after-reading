@@ -112,7 +112,11 @@
       <v-window-item>
         <v-card class="d-flex flex-column justify-center align-center py-10">
           <div class="pb-10">点击消息进行阅读，倒计时完成时销毁</div>
-          <img style="width: 50vw" src="./assets/guide.webp" alt="浮窗模式" />
+          <img
+            style="width: 50vw; min-height: 108vw"
+            src="./assets/guide.webp"
+            alt="浮窗模式"
+          />
         </v-card>
       </v-window-item>
       <v-window-item>
@@ -120,7 +124,11 @@
           <div class="pb-10">
             开启<span class="font-weight-black">浮窗</span>模式体验更佳
           </div>
-          <img style="width: 50vw" src="./assets/float.webp" alt="浮窗模式" />
+          <img
+            style="width: 50vw; min-height: 108vw"
+            src="./assets/float.webp"
+            alt="浮窗模式"
+          />
         </v-card>
       </v-window-item>
     </v-window>
@@ -323,6 +331,9 @@ let sessionNick = sessionStorage.getItem("chat.nick");
 if (sessionNick) {
   nick.value = sessionNick;
   connect();
+} else {
+  new Image().src = "src/assets/guide.webp";
+  new Image().src = "src/assets/float.webp";
 }
 
 const handleRead = (dialog) => {
