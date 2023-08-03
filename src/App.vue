@@ -115,7 +115,7 @@
           <img
             style="width: 50vw; min-height: 108vw"
             src="./assets/guide.webp"
-            alt="浮窗模式"
+            alt="使用说明"
           />
         </v-card>
       </v-window-item>
@@ -140,6 +140,8 @@
     v-model="snackbar.visible"
     >{{ snackbar.content }}</v-snackbar
   >
+  <img width="0" height="0" src="./assets/guide.webp" />
+  <img width="0" height="0" src="./assets/float.webp" />
 </template>
 
 <script setup>
@@ -331,9 +333,6 @@ let sessionNick = sessionStorage.getItem("chat.nick");
 if (sessionNick) {
   nick.value = sessionNick;
   connect();
-} else {
-  new Image().src = "/assets/guide.webp";
-  new Image().src = "/assets/float.webp";
 }
 
 const handleRead = (dialog) => {
