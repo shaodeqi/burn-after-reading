@@ -107,15 +107,24 @@
       ></v-text-field>
     </div>
   </div>
-  <!-- <v-overlay v-model="overlay" contained class="align-center justify-center">
-    <v-window v-model="overlay" show-arrows style="width: 80vw">
-      <v-window-item v-for="n in 10" :key="n">
-        <v-card height="200px" class="d-flex justify-center align-center">
-          <span class="text-h2">Card</span>
+  <v-overlay v-model="overlay" contained class="align-center justify-center">
+    <v-window :model-value="true" show-arrows style="width: 80vw">
+      <v-window-item>
+        <v-card class="d-flex flex-column justify-center align-center py-10">
+          <div class="pb-10">点击消息进行阅读，倒计时完成时销毁</div>
+          <img style="width: 50vw" src="./assets/guide.webp" alt="浮窗模式" />
+        </v-card>
+      </v-window-item>
+      <v-window-item>
+        <v-card class="d-flex flex-column justify-center align-center py-10">
+          <div class="pb-10">
+            开启<span class="font-weight-black">浮窗</span>模式体验更佳
+          </div>
+          <img style="width: 50vw" src="./assets/float.webp" alt="浮窗模式" />
         </v-card>
       </v-window-item>
     </v-window>
-  </v-overlay> -->
+  </v-overlay>
   <v-snackbar
     location="top"
     color="red-lighten-1"
@@ -148,7 +157,7 @@ const snackbar = reactive({
   visible: false,
   content: "",
 });
-const overlay = ref(true);
+const overlay = ref(false);
 const dialogsContainer = ref();
 const message = ref("");
 const nick = ref("");
@@ -218,7 +227,7 @@ const handleEnter = (event) => {
   event.preventDefault();
 };
 
-const connect = () => {
+const connect = (isFirst) => {
   loading.nick = true;
   socket = new ReconnectingWebSocket(
     `${wsOrigin}?room=${room}&user=${nick.value}&key=${md5(
@@ -232,6 +241,10 @@ const connect = () => {
   socket.onopen = () => {
     loading.nick = false;
     connected.value = true;
+    if (isFirst) {
+      overlay.value = true;
+    }
+
     sendMessage("message.get", undefined, [nick.value]);
   };
   socket.onclose = ({ reason }) => {
@@ -303,7 +316,7 @@ const handleNick = (event) => {
   }
   nick.value = inputNick;
   sessionStorage.setItem("chat.nick", nick.value);
-  connect();
+  connect(true);
 };
 
 let sessionNick = sessionStorage.getItem("chat.nick");
