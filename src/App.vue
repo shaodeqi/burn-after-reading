@@ -332,8 +332,8 @@ if (sessionNick) {
   nick.value = sessionNick;
   connect();
 } else {
-  new Image().src = "src/assets/guide.webp";
-  new Image().src = "src/assets/float.webp";
+  new Image().src = "/assets/guide.webp";
+  new Image().src = "/assets/float.webp";
 }
 
 const handleRead = (dialog) => {
