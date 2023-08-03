@@ -72,7 +72,7 @@
         bg-color="white"
         theme="white"
         maxlength="300"
-        enterkeyhint="go"
+        enterkeyhint="send"
         v-model="message"
         auto-grow
         variant="outlined"
@@ -87,14 +87,16 @@
     v-if="!connected"
   >
     <div class="w-75">
-      <div class="mt-2" v-if="inWeiXin">
+      <!-- <div class="mt-2" v-if="inWeiXin">
         <v-alert
+          class="text-body-2"
           position="fixed"
           location="top right"
           variant="text"
-          text="进入“浮窗”模式体验更佳 ⇧ "
-        ></v-alert>
-      </div>
+        >
+          进入 <span>123</span> 模式切换页面体验更佳 ⇧
+        </v-alert>
+      </div> -->
       <v-text-field
         class="mt-16"
         :loading="loading.nick"
@@ -105,6 +107,15 @@
       ></v-text-field>
     </div>
   </div>
+  <!-- <v-overlay v-model="overlay" contained class="align-center justify-center">
+    <v-window v-model="overlay" show-arrows style="width: 80vw">
+      <v-window-item v-for="n in 10" :key="n">
+        <v-card height="200px" class="d-flex justify-center align-center">
+          <span class="text-h2">Card</span>
+        </v-card>
+      </v-window-item>
+    </v-window>
+  </v-overlay> -->
   <v-snackbar
     location="top"
     color="red-lighten-1"
@@ -128,7 +139,7 @@ import {
 import listenVisualViewport from "@/compositions/visual-viewport";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
-const inWeiXin = navigator.userAgent.toLowerCase().includes("micromessenger");
+const inWeiXin = !navigator.userAgent.toLowerCase().includes("micromessenger");
 const searchParams = new URLSearchParams(location.search);
 const loading = reactive({
   nick: false,
@@ -137,6 +148,7 @@ const snackbar = reactive({
   visible: false,
   content: "",
 });
+const overlay = ref(true);
 const dialogsContainer = ref();
 const message = ref("");
 const nick = ref("");
@@ -149,11 +161,11 @@ let socket;
 let justClosedUser;
 
 if (!room) {
-  room = 'public';
+  room = "public";
   searchParams.set("room", room);
   location.search = searchParams.toString();
 }
-document.title = room
+document.title = room;
 
 if (location.host === "127.0.0.1:3001") {
   hash = "b793bde3f67ae928d93dc96fa16f2b93";
