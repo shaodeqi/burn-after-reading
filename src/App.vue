@@ -108,7 +108,7 @@
     </div>
   </div>
   <v-overlay v-model="overlay" contained class="align-center justify-center">
-    <v-window :model-value="true" show-arrows style="width: 80vw">
+    <v-window :model-value="true" show-arrows style="width: 80vw; max-width: 80vh;">
       <v-window-item>
         <v-card class="d-flex flex-column justify-center align-center py-10">
           <div class="pb-10">点击消息进行阅读，倒计时完成时销毁</div>
@@ -251,7 +251,7 @@ const connect = (isFirst) => {
   socket.onopen = () => {
     loading.nick = false;
     connected.value = true;
-    if (isFirst) {
+    if (isFirst && inWeiXin) {
       overlay.value = true;
     }
 
