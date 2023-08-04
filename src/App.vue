@@ -158,7 +158,7 @@ import {
 import listenVisualViewport from "@/compositions/visual-viewport";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
-const inWeiXin = !navigator.userAgent.toLowerCase().includes("micromessenger");
+const inWeiXin = navigator.userAgent.toLowerCase().includes("micromessenger");
 const searchParams = new URLSearchParams(location.search);
 const loading = reactive({
   nick: false,
