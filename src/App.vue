@@ -1,91 +1,51 @@
 <template>
-  <div
-    class="d-flex flex-column fill-height"
-    :style="{
-      filter: connected ? 'unset' : 'blur(10px)',
-    }"
-  >
+  <div class="d-flex flex-column fill-height" :style="{
+    filter: connected ? 'unset' : 'blur(10px)',
+  }">
     <!-- <div class="d-flex align-center justify-center px-1 py-2 header-container">
       <span>1</span>
       <span style="position: absolute; right: 12px">设置</span>
     </div> -->
     <v-divider></v-divider>
-    <div
-      class="d-flex flex-column flex-1-1 pa-3 overflow-auto dialogs-container"
-      ref="dialogsContainer"
-    >
+    <div class="d-flex flex-column flex-1-1 pa-3 overflow-auto dialogs-container" ref="dialogsContainer">
       <TransitionGroup name="dialog">
         <template v-for="(dialog, dIndex) in dialogs" :key="dialog.id">
-          <div
-            v-if="dialog.type === 'text'"
-            :class="[own(dialog) ? 'align-self-end' : 'align-self-start']"
-            style="max-width: 90%"
-            @click="handleRead(dialog, dIndex)"
-          >
-            <div
-              class="text-medium-emphasis text-body-2"
-              :class="[own(dialog) ? 'text-right' : 'text-left']"
-            >
+          <div v-if="dialog.type === 'text'" :class="[own(dialog) ? 'align-self-end' : 'align-self-start']"
+            style="max-width: 90%" @click="handleRead(dialog, dIndex)">
+            <div class="text-medium-emphasis text-body-2" :class="[own(dialog) ? 'text-right' : 'text-left']">
+              <span v-if="dialog.timestamp && own(dialog)" class="text-body-2 text-grey-lighten-1">{{ new
+                Date(dialog.timestamp).toLocaleString() }}</span>
               {{ dialog.nick }}
+              <span v-if="dialog.timestamp && !own(dialog)" class="text-body-2 text-grey-lighten-1">{{ new
+                Date(dialog.timestamp).toLocaleString() }}</span>
             </div>
-            <v-badge
-              color="red-lighten-1"
-              :model-value="badge(dialog)"
-              :content="dialog.countDown"
-              :dot="dot(dialog)"
-              :location="own(dialog) ? 'top start' : 'top end'"
-              :class="{ own: own(dialog) }"
-              class="mb-4 px-1 rounded dialog-badge"
-            >
-              <div
-                style="white-space: break-spaces"
-                class="px-1 py-2 dialog"
-                :class="{
-                  blur: blur(dialog),
-                }"
-              >
+            <v-badge color="red-lighten-1" :model-value="badge(dialog)" :content="dialog.countDown" :dot="dot(dialog)"
+              :location="own(dialog) ? 'top start' : 'top end'" :class="[own(dialog) ? 'float-right own' : 'float-left']"
+              class="mb-4 px-1 rounded dialog-badge">
+              <div style="white-space: break-spaces" class="px-1 py-2 dialog" :class="{
+                blur: blur(dialog),
+              }">
                 {{ dialog.message }}
               </div>
             </v-badge>
           </div>
           <div v-if="dialog.type === 'state.enter'" class="align-self-center">
-            <span class="text-body-2 text-grey-darken-1"
-              >{{ dialog.message }}进入房间</span
-            >
+            <span class="text-body-2 text-grey-darken-1">{{ dialog.message }}进入房间</span>
           </div>
           <div v-if="dialog.type === 'state.leave'" class="align-self-center">
-            <span class="text-body-2 text-grey-darken-1"
-              >{{ dialog.message }}离开房间</span
-            >
+            <span class="text-body-2 text-grey-darken-1">{{ dialog.message }}离开房间</span>
           </div>
         </template>
       </TransitionGroup>
     </div>
     <v-divider></v-divider>
     <div class="d-flex px-4 py-2 pb-5 input-container bg-grey-lighten-4">
-      <v-textarea
-        @focus="scrollToBottom()"
-        @input="scrollToBottom()"
-        @keydown.enter="handleEnter"
-        :autofocus="true"
-        base-color="white"
-        bg-color="white"
-        theme="white"
-        maxlength="300"
-        enterkeyhint="send"
-        v-model="message"
-        auto-grow
-        variant="outlined"
-        hide-details
-        rows="1"
-      ></v-textarea>
+      <v-textarea @focus="scrollToBottom()" @input="scrollToBottom()" @keydown.enter="handleEnter" :autofocus="true"
+        base-color="white" bg-color="white" theme="white" maxlength="300" enterkeyhint="send" v-model="message" auto-grow
+        variant="outlined" hide-details rows="1"></v-textarea>
     </div>
   </div>
-  <div
-    class="d-flex flex-column align-center fill-height w-100"
-    style="position: absolute"
-    v-if="!connected"
-  >
+  <div class="d-flex flex-column align-center fill-height w-100" style="position: absolute" v-if="!connected">
     <div class="w-75">
       <!-- <div class="mt-2" v-if="inWeiXin">
         <v-alert
@@ -97,14 +57,8 @@
           进入 <span>123</span> 模式切换页面体验更佳 ⇧
         </v-alert>
       </div> -->
-      <v-text-field
-        class="mt-16"
-        :loading="loading.nick"
-        label="请输入昵称后 ↵ 进入"
-        v-model="nick"
-        enterkeyhint="go"
-        @keydown.enter="handleNick"
-      ></v-text-field>
+      <v-text-field class="mt-16" :loading="loading.nick" label="请输入昵称后 ↵ 进入" v-model="nick" enterkeyhint="go"
+        @keydown.enter="handleNick"></v-text-field>
     </div>
   </div>
   <v-overlay v-model="overlay" contained class="align-center justify-center">
@@ -112,11 +66,7 @@
       <v-window-item>
         <v-card class="d-flex flex-column justify-center align-center py-10">
           <div class="pb-10">点击消息进行阅读，倒计时完成时销毁</div>
-          <img
-            style="width: 50vw; min-height: 108vw"
-            src="./assets/guide.webp"
-            alt="使用说明"
-          />
+          <img style="width: 50vw; min-height: 108vw" src="./assets/guide.webp" alt="使用说明" />
         </v-card>
       </v-window-item>
       <v-window-item>
@@ -124,22 +74,13 @@
           <div class="pb-10">
             开启<span class="font-weight-black">浮窗</span>模式体验更佳
           </div>
-          <img
-            style="width: 50vw; min-height: 108vw"
-            src="./assets/float.webp"
-            alt="浮窗模式"
-          />
+          <img style="width: 50vw; min-height: 108vw" src="./assets/float.webp" alt="浮窗模式" />
         </v-card>
       </v-window-item>
     </v-window>
   </v-overlay>
-  <v-snackbar
-    location="top"
-    color="red-lighten-1"
-    timeout="3000"
-    v-model="snackbar.visible"
-    >{{ snackbar.content }}</v-snackbar
-  >
+  <v-snackbar location="top" color="red-lighten-1" timeout="3000" v-model="snackbar.visible">{{ snackbar.content
+  }}</v-snackbar>
   <img width="0" height="0" src="./assets/guide.webp" />
   <img width="0" height="0" src="./assets/float.webp" />
 </template>
@@ -188,7 +129,7 @@ document.title = room;
 
 if (location.host === "127.0.0.1:3001") {
   hash = "b793bde3f67ae928d93dc96fa16f2b93";
-  wsOrigin = "ws://127.0.0.1:9000";
+  // wsOrigin = "ws://127.0.0.1:9000";
 }
 
 const scrollToBottom = (() => {
@@ -232,6 +173,7 @@ const handleEnter = (event) => {
     state: dialogState.UNREAD,
     countDown: 0,
     id: randomString(16),
+    timestamp: +new Date(),
   });
 
   event.preventDefault();
@@ -271,7 +213,7 @@ const connect = (isFirst) => {
   };
   socket.onmessage = async ({ data: originData }) => {
     const payload = await handleMessageData(originData);
-    let { cmd, data, user } = payload;
+    let { cmd, data, user, timestamp } = payload;
     switch (cmd) {
       case "connect":
         if (justClosedUser === user) {
@@ -300,14 +242,14 @@ const connect = (isFirst) => {
       case "send":
         switch (data?.type) {
           case "message.get":
-            if (data.content instanceof Array && data.content.length) {
+            if (data.content instanceof Array) {
               dialogs.value = data.content;
             }
             scrollToBottom();
             break;
 
           case "message.new":
-            dialogs.value.push(data.content);
+            dialogs.value.push({ ...data.content, timestamp });
             scrollToBottom();
             break;
 
@@ -388,21 +330,26 @@ body,
 <style lang="scss" scoped>
 .dialog-badge {
   background-color: #fff;
+
   &.own {
     background-color: #abeb7b;
   }
 }
+
 .dialog {
   word-break: break-word;
   line-height: 1.5;
+
   &.blur {
     filter: blur(6px);
   }
 }
+
 .dialog-enter-active,
 .dialog-leave-active {
   transition: all 0.5s ease;
 }
+
 .dialog-enter-from,
 .dialog-leave-to {
   opacity: 0;
