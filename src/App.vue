@@ -293,7 +293,7 @@ const countDown = (id) => {
   }
 
   const dialog = dialogs.value[dIndex];
-  dialog.countDown = Math.min(20, Math.ceil(dialog.message.length / 2));
+  dialog.countDown = 20;
   dialog.state = dialogState.READING;
   const main = () => {
     setTimeout(() => {
@@ -301,7 +301,8 @@ const countDown = (id) => {
         dialog.countDown--;
         main();
       } else {
-        dialogs.value.splice(dIndex, 1);
+        const newDIndex = dialogs.value.findIndex((dialog) => dialog.id === id);
+        dialogs.value.splice(newDIndex, 1);
       }
     }, 1000);
   };
