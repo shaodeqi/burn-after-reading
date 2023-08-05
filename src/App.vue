@@ -286,13 +286,10 @@ const handleRead = (dialog) => {
 };
 
 const countDown = (id) => {
-  const dIndex = dialogs.value.findIndex((dialog) => dialog.id === id);
-
-  if (dIndex === -1) {
+  const dialog = dialogs.value.find((dialog) => dialog.id === id);
+  if (!dialog) {
     return;
   }
-
-  const dialog = dialogs.value[dIndex];
   dialog.countDown = 20;
   dialog.state = dialogState.READING;
   const main = () => {
@@ -301,8 +298,8 @@ const countDown = (id) => {
         dialog.countDown--;
         main();
       } else {
-        const newDIndex = dialogs.value.findIndex((dialog) => dialog.id === id);
-        dialogs.value.splice(newDIndex, 1);
+        const dIndex = dialogs.value.findIndex((dialog) => dialog.id === id);
+        dialogs.value.splice(dIndex, 1);
       }
     }, 1000);
   };
