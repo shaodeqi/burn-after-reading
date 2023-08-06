@@ -179,7 +179,7 @@ const handleEnter = (event) => {
   event.preventDefault();
 };
 
-const connect = (isFirst) => {
+const connect = () => {
   loading.nick = true;
   socket = new ReconnectingWebSocket(
     `${wsOrigin}?room=${room}&user=${nick.value}&key=${md5(
@@ -193,9 +193,9 @@ const connect = (isFirst) => {
   socket.onopen = () => {
     loading.nick = false;
     connected.value = true;
-    if (isFirst && inWeiXin) {
-      overlay.value = true;
-    }
+    // if (isFirst && inWeiXin) {
+    //   overlay.value = true;
+    // }
 
     sendMessage("message.get", undefined, [nick.value]);
   };
@@ -243,7 +243,7 @@ const connect = (isFirst) => {
         switch (data?.type) {
           case "message.get":
             if (data.content instanceof Array) {
-              dialogs.value = data.content;
+              dialogs.value =[dialogs.value.filter(d => d.countDown > 0), ...data.content];
             }
             scrollToBottom();
             break;
@@ -268,13 +268,17 @@ const handleNick = (event) => {
   }
   nick.value = inputNick;
   sessionStorage.setItem("chat.nick", nick.value);
-  connect(true);
+  localStorage.setItem("chat.nick", nick.value);
+  connect();
 };
 
 let sessionNick = sessionStorage.getItem("chat.nick");
+let localNick = localStorage.getItem("chat.nick");
 if (sessionNick) {
   nick.value = sessionNick;
   connect();
+} else if (localNick) {
+  nick.value = localNick;
 }
 
 const handleRead = (dialog) => {
