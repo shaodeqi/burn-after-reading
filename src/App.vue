@@ -120,7 +120,6 @@
             style="display: none"
             type="file"
             accept="image/*"
-            capture="environment"
           />
           <v-icon @click="handleChooseImage" icon="mdi-image"></v-icon>
         </template>
@@ -536,7 +535,6 @@ body,
     line-height: 1.5;
   }
   &.dialog-image {
-    user-select: none;
     img {
       min-width: 10vw;
       max-width: 90vw;
