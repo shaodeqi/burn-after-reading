@@ -120,7 +120,7 @@
             style="display: none"
             type="file"
             accept="image/*"
-            capture="user"
+            capture="environment"
           />
           <v-icon @click="handleChooseImage" icon="mdi-image"></v-icon>
         </template>
