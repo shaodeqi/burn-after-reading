@@ -6,7 +6,7 @@
     }"
   >
     <!-- <div class="d-flex align-center justify-center px-1 py-2 header-container">
-      <span>1</span>
+      <span>{{ room }}</span>
       <span style="position: absolute; right: 12px">设置</span>
     </div> -->
     <div
@@ -30,7 +30,7 @@
       <TransitionGroup name="dialog">
         <template v-for="(dialog, dIndex) in dialogs" :key="dialog.id">
           <div
-            v-if="dialog.type === 'text'"
+            v-if="['text', 'image'].includes(dialog.type)"
             :class="[own(dialog) ? 'align-self-end' : 'align-self-start']"
             style="max-width: 90%"
             @click="handleRead(dialog, dIndex)"
@@ -61,6 +61,7 @@
               class="mb-4 px-1 rounded dialog-badge"
             >
               <div
+                v-if="dialog.type === 'text'"
                 style="white-space: break-spaces"
                 class="px-1 py-2 dialog"
                 :class="{
@@ -68,6 +69,16 @@
                 }"
               >
                 {{ dialog.message }}
+              </div>
+              <div
+                v-if="dialog.type === 'image'"
+                style="white-space: break-spaces"
+                class="px-1 py-2 dialog dialog-image"
+                :class="{
+                  blur: blur(dialog),
+                }"
+              >
+                <img :src="dialog.message" alt="" />
               </div>
             </v-badge>
           </div>
@@ -102,10 +113,17 @@
         hide-details
         rows="1"
       >
-        <!-- <template #append>
-        <input ref="imageInput" @change="handleSendImage" style="display: none;" type="file" accept="image/*" capture="camera">
-        <v-icon @click="handleChooseImage" icon="mdi-image"></v-icon>
-      </template> -->
+        <template #append>
+          <input
+            ref="imageInput"
+            @change="handleSendImage"
+            style="display: none"
+            type="file"
+            accept="image/*"
+            capture="camera"
+          />
+          <v-icon @click="handleChooseImage" icon="mdi-image"></v-icon>
+        </template>
       </v-textarea>
     </div>
   </div>
@@ -126,16 +144,12 @@
     </div>
   </div>
   <v-overlay
-    :model-value="true"
+    :model-value="overlay"
     :persistent="true"
     contained
     class="align-center justify-center"
   >
-    <v-window
-      :model-value="false"
-      show-arrows
-      style="width: 80vw; max-width: 80vh"
-    >
+    <v-window show-arrows style="width: 80vw; max-width: 80vh">
       <v-window-item>
         <v-card class="d-flex flex-column justify-center align-center py-10">
           <!-- <div class="pb-10">点击消息进行阅读，倒计时完成时销毁</div> -->
@@ -144,7 +158,7 @@
             src="./assets/guide.webp"
             alt="使用说明"
           /> -->
-          <img style="width: 50vw" src="./assets/pay.webp" alt="" />
+          <img style="width: 60vw" src="./assets/pay.webp" alt="" />
         </v-card>
       </v-window-item>
       <!-- <v-window-item>
@@ -200,7 +214,7 @@ const snackbar = reactive({
   visible: false,
   content: "",
 });
-const overlay = ref(true);
+const overlay = computed(() => !["public"].includes(room));
 const dialogsContainer = ref();
 const imageInput = ref(null);
 const message = ref("");
@@ -316,15 +330,23 @@ const connect = () => {
     const payload = await handleMessageData(originData);
     let { cmd, data, user, timestamp } = payload;
     switch (cmd) {
+      // 有用户上线
       case "connect":
         if (justClosedUser === user) {
-          dialogs.value.pop();
+          const { type: lastType, message: lastMessage } =
+            dialogs.value[dialogs.value.length - 1];
+
+          // 用户刚刚离开又进入则将“离开提示”删除
+          if (lastType === "state.leave" && lastMessage === user) {
+            dialogs.value.pop();
+          }
         }
 
-        if (
-          dialogs.value[dialogs.value.length - 1]?.type === "state.enter" &&
-          dialogs.value[dialogs.value.length - 1]?.message === user
-        ) {
+        const { type: lastType, message: lastMessage } =
+          dialogs.value[dialogs.value.length - 1];
+        
+        // 合并多条进入提示
+        if (lastType === "state.enter" && lastMessage === user) {
           return;
         }
 
@@ -344,8 +366,10 @@ const connect = () => {
           message: user,
         });
         break;
+
       case "send":
         switch (data?.type) {
+          // 拉取到消息历史
           case "message.get":
             if (data.content instanceof Array) {
               dialogs.value = [
@@ -356,6 +380,7 @@ const connect = () => {
             scrollToBottom();
             break;
 
+          // 新消息
           case "message.new":
             dialogs.value.push({ ...data.content, timestamp });
 
@@ -366,6 +391,7 @@ const connect = () => {
             scrollToBottom();
             break;
 
+          // 对方阅读中
           case "message.read":
             countDown(data.content);
             break;
@@ -389,7 +415,6 @@ const handleChooseImage = () => {
 };
 
 const handleSendImage = (e) => {
-  console.log(imageInput.value.files);
   if (imageInput.value.files.length) {
     new Compressor(imageInput.value.files[0], {
       maxWidth: 960,
@@ -401,8 +426,15 @@ const handleSendImage = (e) => {
         reader.addEventListener(
           "load",
           () => {
-            // convert image file to base64 string
-            console.log(reader.result);
+            const message = reader.result;
+            sendMessage("message.new", {
+              type: "image",
+              message: reader.result,
+              nick: nick.value,
+              state: dialogState.UNREAD,
+              countDown: 0,
+              id: randomString(16),
+            });
           },
           false
         );
@@ -465,7 +497,6 @@ html,
 body,
 #app {
   height: 100%;
-  // filter: blur(10px);
 }
 </style>
 <style lang="scss" scoped>
@@ -501,6 +532,14 @@ body,
 
   &.blur {
     filter: blur(6px);
+  }
+  &-image {
+    img {
+      min-width: 5vw;
+      max-width: 80vw;
+      min-height: 5vw;
+      max-height: 80vw;
+    }
   }
 }
 
