@@ -63,7 +63,7 @@
               <div
                 v-if="dialog.type === 'text'"
                 style="white-space: break-spaces"
-                class="px-1 py-2 dialog"
+                class="px-1 py-2 dialog dialog-text"
                 :class="{
                   blur: blur(dialog),
                 }"
@@ -73,12 +73,12 @@
               <div
                 v-if="dialog.type === 'image'"
                 style="white-space: break-spaces"
-                class="px-1 py-2 dialog dialog-image"
+                class="px-1 py-1 dialog dialog-image"
                 :class="{
                   blur: blur(dialog),
                 }"
               >
-                <img :src="dialog.message" alt="" />
+                <img :src="dialog.message" alt="图片" />
               </div>
             </v-badge>
           </div>
@@ -120,7 +120,7 @@
             style="display: none"
             type="file"
             accept="image/*"
-            capture="camera"
+            capture="user"
           />
           <v-icon @click="handleChooseImage" icon="mdi-image"></v-icon>
         </template>
@@ -344,7 +344,7 @@ const connect = () => {
 
         const { type: lastType, message: lastMessage } =
           dialogs.value[dialogs.value.length - 1];
-        
+
         // 合并多条进入提示
         if (lastType === "state.enter" && lastMessage === user) {
           return;
@@ -528,17 +528,20 @@ body,
 
 .dialog {
   word-break: break-word;
-  line-height: 1.5;
 
   &.blur {
     filter: blur(6px);
   }
-  &-image {
+  &.dialog-text {
+    line-height: 1.5;
+  }
+  &.dialog-image {
+    user-select: none;
     img {
-      min-width: 5vw;
-      max-width: 80vw;
-      min-height: 5vw;
-      max-height: 80vw;
+      min-width: 10vw;
+      max-width: 90vw;
+      min-height: 10vw;
+      max-height: 90vw;
     }
   }
 }
