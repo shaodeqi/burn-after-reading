@@ -132,7 +132,7 @@
     class="align-center justify-center"
   >
     <v-window
-      :model-value="room === 'dududu'"
+      :model-value="false"
       show-arrows
       style="width: 80vw; max-width: 80vh"
     >
