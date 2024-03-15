@@ -101,7 +101,12 @@
         variant="outlined"
         hide-details
         rows="1"
-      ></v-textarea>
+      >
+        <!-- <template #append>
+        <input ref="imageInput" @change="handleSendImage" style="display: none;" type="file" accept="image/*" capture="camera">
+        <v-icon @click="handleChooseImage" icon="mdi-image"></v-icon>
+      </template> -->
+      </v-textarea>
     </div>
   </div>
   <div
@@ -120,23 +125,29 @@
       ></v-text-field>
     </div>
   </div>
-  <v-overlay v-model="overlay" contained class="align-center justify-center">
+  <v-overlay
+    :model-value="true"
+    :persistent="true"
+    contained
+    class="align-center justify-center"
+  >
     <v-window
-      :model-value="true"
+      :model-value="room === 'dududu'"
       show-arrows
       style="width: 80vw; max-width: 80vh"
     >
       <v-window-item>
         <v-card class="d-flex flex-column justify-center align-center py-10">
-          <div class="pb-10">点击消息进行阅读，倒计时完成时销毁</div>
-          <img
+          <!-- <div class="pb-10">点击消息进行阅读，倒计时完成时销毁</div> -->
+          <!-- <img
             style="width: 50vw; min-height: 108vw"
             src="./assets/guide.webp"
             alt="使用说明"
-          />
+          /> -->
+          <img style="width: 50vw" src="./assets/pay.webp" alt="" />
         </v-card>
       </v-window-item>
-      <v-window-item>
+      <!-- <v-window-item>
         <v-card class="d-flex flex-column justify-center align-center py-10">
           <div class="pb-10">
             开启<span class="font-weight-black">浮窗</span>模式体验更佳
@@ -147,7 +158,7 @@
             alt="浮窗模式"
           />
         </v-card>
-      </v-window-item>
+      </v-window-item> -->
     </v-window>
   </v-overlay>
   <v-snackbar
@@ -164,6 +175,7 @@
 <script setup>
 import { ref, reactive, onMounted, nextTick, computed } from "vue";
 import md5 from "blueimp-md5";
+import Compressor from "compressorjs";
 import {
   notify,
   dialogState,
@@ -188,8 +200,9 @@ const snackbar = reactive({
   visible: false,
   content: "",
 });
-const overlay = ref(false);
+const overlay = ref(true);
 const dialogsContainer = ref();
+const imageInput = ref(null);
 const message = ref("");
 const nick = ref("");
 const dialogs = ref([]);
@@ -369,6 +382,33 @@ const handleNick = (event) => {
   nick.value = inputNick;
   localStorage.setItem("chat.nick", nick.value);
   connect();
+};
+
+const handleChooseImage = () => {
+  imageInput.value.click();
+};
+
+const handleSendImage = (e) => {
+  console.log(imageInput.value.files);
+  if (imageInput.value.files.length) {
+    new Compressor(imageInput.value.files[0], {
+      maxWidth: 960,
+      maxHeight: 1200,
+      convertSize: 100000,
+      success(file) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.addEventListener(
+          "load",
+          () => {
+            // convert image file to base64 string
+            console.log(reader.result);
+          },
+          false
+        );
+      },
+    });
+  }
 };
 
 const localNick = localStorage.getItem("chat.nick");
