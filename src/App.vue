@@ -333,7 +333,7 @@ const connect = () => {
       case "connect":
         if (justClosedUser === user) {
           const { type: lastType, message: lastMessage } =
-            dialogs.value[dialogs.value.length - 1];
+            dialogs.value[dialogs.value.length - 1] || {};
 
           // 用户刚刚离开又进入则将“离开提示”删除
           if (lastType === "state.leave" && lastMessage === user) {
@@ -342,7 +342,7 @@ const connect = () => {
         }
 
         const { type: lastType, message: lastMessage } =
-          dialogs.value[dialogs.value.length - 1];
+          dialogs.value[dialogs.value.length - 1] || {};
 
         // 合并多条进入提示
         if (lastType === "state.enter" && lastMessage === user) {
