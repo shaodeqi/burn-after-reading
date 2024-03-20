@@ -213,7 +213,7 @@ const snackbar = reactive({
   visible: false,
   content: "",
 });
-const overlay = computed(() => !["public"].includes(room));
+const overlay = computed(() => !["public", "dududu"].includes(room));
 const dialogsContainer = ref();
 const imageInput = ref(null);
 const message = ref("");
