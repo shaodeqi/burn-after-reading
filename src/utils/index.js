@@ -4,7 +4,7 @@ export * from "./constants"
 export const type = (content) =>
   Object.prototype.toString.call(content).slice(8, -1);
 
-export const notify = (title, body = '') => {
+export const notify = (title, body = '新消息 new message') => {
 if (!('Notification' in globalThis)) {
     return;
 }

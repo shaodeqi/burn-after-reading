@@ -384,7 +384,7 @@ const connect = () => {
             dialogs.value.push({ ...data.content, timestamp });
 
             if (data.content.nick && data.content.nick !== nick.value) {
-              notify(room, data.content.message);
+              notify(room);
             }
 
             scrollToBottom();
